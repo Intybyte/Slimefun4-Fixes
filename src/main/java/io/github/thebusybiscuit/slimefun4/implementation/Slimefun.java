@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Preconditions;
 import io.github.thebusybiscuit.slimefun4.storage.Storage;
 import io.github.thebusybiscuit.slimefun4.storage.backend.legacy.LegacyStorage;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -1038,8 +1038,8 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
      * @return The resulting {@link BukkitTask} or null if Slimefun was disabled
      */
     public static @Nullable BukkitTask runSync(@Nonnull Runnable runnable, long delay) {
-        Validate.notNull(runnable, "Cannot run null");
-        Validate.isTrue(delay >= 0, "The delay cannot be negative");
+        Preconditions.checkNotNull(runnable, "Cannot run null");
+        Preconditions.checkArgument(delay >= 0, "The delay cannot be negative");
 
         // Run the task instantly within a Unit Test
         if (getMinecraftVersion() == MinecraftVersion.UNIT_TEST) {
@@ -1067,7 +1067,7 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
      * @return The resulting {@link BukkitTask} or null if Slimefun was disabled
      */
     public static @Nullable BukkitTask runSync(@Nonnull Runnable runnable) {
-        Validate.notNull(runnable, "Cannot run null");
+        Preconditions.checkNotNull(runnable, "Cannot run null");
 
         // Run the task instantly within a Unit Test
         if (getMinecraftVersion() == MinecraftVersion.UNIT_TEST) {

@@ -1,15 +1,17 @@
 package io.github.thebusybiscuit.slimefun4.api.items.groups;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import org.apache.commons.lang.Validate;
+import com.google.common.base.Preconditions;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -70,7 +72,7 @@ public class LockedItemGroup extends ItemGroup {
     @ParametersAreNonnullByDefault
     public LockedItemGroup(NamespacedKey key, ItemStack item, int tier, NamespacedKey... parents) {
         super(key, item, tier);
-        Validate.noNullElements(parents, "A LockedItemGroup must not have any 'null' parents!");
+        Preconditions.checkArgument(Arrays.stream(parents).noneMatch(Objects::isNull), "A LockedItemGroup must not have any 'null' parents!");
 
         this.keys = parents;
     }
@@ -151,8 +153,8 @@ public class LockedItemGroup extends ItemGroup {
      * @return Whether the {@link Player} has fully completed all parent categories, otherwise false
      */
     public boolean hasUnlocked(@Nonnull Player p, @Nonnull PlayerProfile profile) {
-        Validate.notNull(p, "The player cannot be null!");
-        Validate.notNull(profile, "The Profile cannot be null!");
+        Preconditions.checkNotNull(p, "The player cannot be null!");
+        Preconditions.checkNotNull(profile, "The Profile cannot be null!");
 
         for (ItemGroup parent : parents) {
             for (SlimefunItem item : parent.getItems()) {
