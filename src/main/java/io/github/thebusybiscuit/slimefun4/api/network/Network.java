@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 
@@ -139,6 +140,21 @@ public abstract class Network {
         }
     }
 
+    protected void removeLocationToNetwork(@Nonnull Location l) {
+        Validate.notNull(l, "You cannot add a Location to a Network which is null!");
+        Validate.isTrue(l.getWorld().getUID().equals(worldId), "Networks cannot exist in multiple worlds!");
+
+        if (positions.remove(BlockPosition.getAsLong(l))) {
+            if (regulator.equals(l)) {
+                manager.unregisterNetwork(this);
+                return;
+            }
+            regulatorNodes.remove(l);
+            connectorNodes.remove(l);
+            terminusNodes.remove(l);
+        }
+    }
+
     /**
      * This method marks the given {@link Location} as dirty and adds it to a {@link Queue}
      * to handle this update.
@@ -226,9 +242,19 @@ public abstract class Network {
     }
 
     private void discoverNeighbors(@Nonnull Location l, double xDiff, double yDiff, double zDiff) {
+        boolean found_stop = false;
         for (int i = getRange() + 1; i > 0; i--) {
             Location newLocation = l.clone().add(i * xDiff, i * yDiff, i * zDiff);
-            addLocationToNetwork(newLocation);
+
+            if (!found_stop)
+                found_stop = newLocation.getBlock().getType() == Material.COAL_BLOCK;
+
+            if (found_stop) {
+                removeLocationToNetwork(newLocation);
+                manager.updateAllNetworks(newLocation);
+            } else {
+                addLocationToNetwork(newLocation);
+            }
         }
     }
 
